@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /painEntries/{entry} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /feedback/{feedbackId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if false; // Only admins should read feedback (managed through Admin SDK)
+    }
+  }
+}
